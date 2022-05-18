@@ -46,6 +46,7 @@ var (
 	//hystrixPort = 9092
 	//监控端口，每个服务不能重复
 	prometheusPort = 9192
+
 )
 
 func main() {
