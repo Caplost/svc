@@ -34,7 +34,7 @@ var (
     //服务地址
     serviceHost = hostIp
     //服务端口
-	servicePort = "8081"
+	servicePort = "8083"
      
 	//注册中心配置
 	consulHost  = hostIp
@@ -45,7 +45,7 @@ var (
 	//熔断端口，每个服务不能重复 
 	//hystrixPort = 9092
 	//监控端口，每个服务不能重复
-	prometheusPort = 9192
+	prometheusPort = 9193
 
 )
 

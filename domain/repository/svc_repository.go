@@ -1,7 +1,9 @@
 package repository
+
 import (
-	"github.com/jinzhu/gorm"
+	"git.imooc.com/coding-535/common"
 	"git.imooc.com/coding-535/svc/domain/model"
+	"github.com/jinzhu/gorm"
 )
 //创建需要实现的接口
 type ISvcRepository interface{
@@ -46,7 +48,30 @@ func (u *SvcRepository) CreateSvc(svc *model.Svc) (int64, error) {
 
 //根据ID删除Svc信息
 func (u *SvcRepository) DeleteSvcByID(svcID int64) error {
-	return u.mysqlDb.Where("id = ?",svcID).Delete(&model.Svc{}).Error
+	tx := u.mysqlDb.Begin()
+	//遇到问题回滚
+	defer func() {
+		if r:=recover();r!=nil{
+			tx.Rollback()
+		}
+	}()
+	if tx.Error !=nil{
+		common.Error(tx.Error)
+		return tx.Error
+	}
+	//删除svc
+	if err:= u.mysqlDb.Where("id = ?", svcID).Delete(&model.Svc{}).Error;err!=nil{
+		tx.Rollback()
+		common.Error(err)
+		return err
+	}
+	//删除相关的port
+	if err:=u.mysqlDb.Where("svc_id = ?",svcID).Delete(&model.SvcPort{}).Error;err!=nil{
+		tx.Rollback()
+		common.Error(err)
+		return err
+	}
+	return tx.Commit().Error
 }
 
 //更新Svc信息
